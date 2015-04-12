@@ -5,9 +5,9 @@ import java.awt.geom.Point2D;
 /**
  * Created by neikila on 11.04.15.
  */
-public class Node {
-    Point2D point;
-    double temperature;
+public class Node implements  Cloneable{
+    private Point2D point;
+    private double temperature;
 
     public Node(Point2D point, double temperature) {
         this.point = point;
@@ -20,5 +20,13 @@ public class Node {
 
     public double getTemperature() {
         return temperature;
+    }
+
+    public void increaseTemperature(double deltaT) {
+        temperature += deltaT;
+    }
+
+    public void setTemperature(double deltaT) {
+        temperature = deltaT;
     }
 }
