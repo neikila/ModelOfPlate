@@ -14,24 +14,27 @@ import java.awt.geom.Rectangle2D;
  */
 public class DrawPlateMesh extends JComponent implements ActionListener {
 
-    int count = 0;
-    Timer timer;
-    MeshForPlateWithRoundCorner mesh;
+    private int count = 0;
+    final private Timer timer;
+    final private MeshForPlateWithRoundCorner mesh;
     final protected double scaleX;
     final protected double scaleY;
     final private DrawPlate drawPlate;
+
     public DrawPlateMesh (MeshForPlateWithRoundCorner mesh, double scaleX, double scaleY) {
         this.scaleX = scaleX;
         this.scaleY = -1 * scaleY;
         this.mesh = mesh;
         drawPlate = new DrawPlate(mesh.getPlate(), scaleX, scaleY);
         timer = new Timer((int) (Settings.deltaTime * 1000), this);
-        start();
     }
 
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
+
+
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         drawPlate.paintComponent(g);
 
@@ -50,18 +53,18 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
                         mesh.getNode(i, (j + 1)).getTemperature() +
                         mesh.getNode((i + 1), j).getTemperature() +
                         mesh.getNode((i + 1), (j + 1)).getTemperature()) / 4.0;
+                int red = (int)(avgTemp / 200 * 255);
+                if (red > 255) {
+                    red = 255;
+                    System.out.println("Red more than 255 i = " + i + " j = " + j);
+                }
+                if (red < 0) {
+                    System.out.println("Red less than 0 i = " + i + " j = " + j);
+                    red = 0;
+                }
+                int blue = 255 - red;
                 try {
-                    int red = (int)(avgTemp / 200 * 255);
-                    if (red > 255) {
-                        red = 255;
-                        System.out.println("Red more than 255 i = " + i + " j = " + j);
-                    }
-                    if (red < 0) {
-                        System.out.println("Red less than 0 i = " + i + " j = " + j);
-                        red = 0;
-                    }
-                    int blue = 255 - red;
-                    g2.setPaint(new Color(red, 0, blue));
+                    g2.setPaint(new Color(red, 0, blue, 150));
                 } catch (Exception e) {
                     System.out.println("I have tried");
                     System.exit(1);
@@ -79,17 +82,24 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
         mesh.iteration(Settings.deltaTime, Settings.leftTemperature, Settings.rightTemperature, Settings.topTemperature, Settings.bottomTemperature);
         repaint();
         ++count;
-        System.out.println("Iteration number: " + count);
+        if (count % 100 == 0) {
+            System.out.println("Iteration number: " + count);
+        }
         if (count  > Settings.count)
             stop();
     }
 
     public void start() {
-        count = 0;
         timer.start();
     }
     public void stop() {
-        System.out.println("Finished");
+        System.out.println("Stopped");
         timer.stop();
     }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return drawPlate.getPreferredSize();
+    }
+
 }

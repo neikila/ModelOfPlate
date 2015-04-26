@@ -142,7 +142,7 @@ public class MeshForPlateWithRoundCorner {
         Node temp;
         int i;
         int j;
-        for (j = 0; j < getMaxYIndex(); ++j) {
+        for (j = 0; j < getMaxYIndex() + 1; ++j) {
             for (i = 0; currentState.containsKey(i + ";" + j); ++i) {
                 tX = 0;
                 tY = 0;

@@ -24,7 +24,7 @@ public class DrawPlate extends JComponent {
         this.scaleY = -1 * scaleY;
         plate = plateWithRoundCorner;
         DEFAULT_WIDTH = (int) (plate.getWidth() * scaleX);
-        DEFAULT_HEIGHT = (int) (plate.getHeight() * (-1) * scaleY);
+        DEFAULT_HEIGHT = (int) (plate.getHeight() * scaleY);
     }
 
     @Override
@@ -66,6 +66,6 @@ public class DrawPlate extends JComponent {
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        return new Dimension((int)plate.getX() + DEFAULT_WIDTH + 5, (int)plate.getY() + DEFAULT_HEIGHT + 5);
     }
 }
