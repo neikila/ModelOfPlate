@@ -26,6 +26,10 @@ public class MeshForPlateWithRoundCorner {
         createMesh();
     }
 
+    public double getDx() { return dx; }
+
+    public double getDy() { return dy; }
+
     private void createMesh() {
 
         final double arcX = plate.getWidth() - plate.getRadius();
@@ -43,53 +47,58 @@ public class MeshForPlateWithRoundCorner {
             y = j * dy;
             for (i = 0; i < limitX; ++i) {
                 x = (i * dx);
-                nodes.put(i + ";" + j, new Node(new Point2D.Double(x, y), defaultTemperature));
+                nodes.put(i + ";" + j, new Node(new Point2D.Double(x, y), defaultTemperature, false));
             }
         }
-        for (j = 0; j < limitY; ++j) {
+
+        for (j = limitYBeforeArc; j < limitY; ++j) {
             y = j * dy;
             for (i = 0; i < limitXBeforeArc; ++i) {
                 x = (i * dx) ;
-                nodes.put(i + ";" + j, new Node(new Point2D.Double(x, y), defaultTemperature));
+                nodes.put(i + ";" + j, new Node(new Point2D.Double(x, y), defaultTemperature, false));
             }
-            for (; Math.pow((i * dx - arcX), 2) + Math.pow((j * dy - arcY), 2) <= Math.pow(plate.getRadius(), 2); ++i) {
+            for (; Math.pow((i * dx - arcX), 2) + Math.pow((j * dy - arcY), 2) < Math.pow(plate.getRadius(), 2); ++i) {
                 x = (i * dx);
-                nodes.put(i + ";" + j, new Node(new Point2D.Double(x, y), defaultTemperature));
+                nodes.put(i + ";" + j, new Node(new Point2D.Double(x, y), defaultTemperature, false));
+            }
+            if (Math.pow((i * dx - arcX), 2) + Math.pow((j * dy - arcY), 2) == Math.pow(plate.getRadius(), 2)) {
+                x = (i * dx);
+                nodes.put(i + ";" + j, new Node(new Point2D.Double(x, y), defaultTemperature, true));
             }
         }
 
-        double tempX;
-        double tempY;
-        boolean flag;
-        for (i = limitXBeforeArc; i < limitX; ++i) {
-            x = i * dx;
-            y = arcY + Math.sqrt(Math.pow(plate.getRadius(), 2) - Math.pow(i * dx - arcX, 2));
-            j = ((int)(y / dy) + 1);
-            flag = (y % dy != 0);
-            tempX = arcX + Math.sqrt(Math.pow(plate.getRadius(), 2) - Math.pow(j * dy - arcY, 2));
-            if (((int)(tempX / dx) + 1) == i && (tempX - x + dx) * dy > (y - (j - 1) * dy) * dx ) {
-                x = tempX;
-                y = j * dy;
-                flag = (x % dx != 0);
-            }
-            if (!nodes.containsKey(i + ";" + j) && flag)
-                nodes.put(i + ";" + j, new Node(new Point2D.Double(x, y), defaultTemperature));
-        }
-
-        for (i = limitYBeforeArc; i < limitY; ++i) {
+        for (i = limitY - 1; i > limitYBeforeArc - 1; --i) {
             y = i * dy;
-            x = arcX + Math.sqrt(Math.pow(plate.getRadius(), 2) - Math.pow(i * dy - arcY, 2));
-            j = ((int)(x / dx) + 1);
-            flag = (x % dx != 0);
-            tempY = arcY + Math.sqrt(Math.pow(plate.getRadius(), 2) - Math.pow(j * dx - arcX, 2));
-            if (((int)(tempY / dy) + 1) == i && (tempY - y + dy) * dx > (x - (j - 1) * dx) * dy ) {
-                y = tempY;
+            x = arcX + Math.sqrt(Math.pow(plate.getRadius(), 2) - Math.pow(y - arcY, 2));
+            j = (int) (x / dx);
+            for (; j < limitX; ++j) {
                 x = j * dx;
-                flag = (y % dy != 0);
+                if (Math.pow(x - dx - arcX, 2) + Math.pow(y - dy - arcY, 2) < Math.pow(plate.getRadius(), 2)) {
+                    if (!nodes.containsKey(j + ";" + i))
+                        nodes.put(j + ";" + i, new Node(new Point2D.Double(x, y), defaultTemperature, true));
+                } else {
+                    break;
+                }
             }
-            if (!nodes.containsKey(j + ";" + i) && flag)
-                nodes.put(j + ";" + i, new Node(new Point2D.Double(x, y), defaultTemperature));
         }
+
+//        for (i = limitXBeforeArc; i < limitX; ++i) {
+//            x = i * dx;
+//            y = arcY + Math.sqrt(Math.pow(plate.getRadius(), 2) - Math.pow(i * dx - arcX, 2));
+//            j = ((int)(y / dy) + 1);
+//            y = j * dy;
+//            if (!nodes.containsKey(i + ";" + j))
+//                nodes.put(i + ";" + j, new Node(new Point2D.Double(x, y), defaultTemperature));
+//        }
+//
+//        for (i = limitYBeforeArc; i < limitY; ++i) {
+//            y = i * dy;
+//            x = arcX + Math.sqrt(Math.pow(plate.getRadius(), 2) - Math.pow(i * dy - arcY, 2));
+//            j = ((int)(x / dx) + 1);
+//            x = j * dx;
+//            if (!nodes.containsKey(j + ";" + i))
+//                nodes.put(j + ";" + i, new Node(new Point2D.Double(x, y), defaultTemperature));
+//        }
         updateCurrentState();
     }
 
@@ -103,6 +112,10 @@ public class MeshForPlateWithRoundCorner {
 
     public int getMaxYIndex() {
         return (int)(plate.getHeight() / dy);
+    }
+
+    public int getMaxXIndex() {
+        return (int)(plate.getWidth() / dx);
     }
 
     public double getX() {
@@ -123,7 +136,7 @@ public class MeshForPlateWithRoundCorner {
             for(Map.Entry<String, Node> entry : nodes.entrySet()) {
                 String key = entry.getKey();
                 Node temp = entry.getValue();
-                Node value = new Node(temp.getPoint(), temp.getTemperature());
+                Node value = new Node(temp.getPoint(), temp.getTemperature(), temp.isEdge());
                 currentState.put(key, value);
             }
         } else {
@@ -134,52 +147,89 @@ public class MeshForPlateWithRoundCorner {
     }
 
     public void iteration(double deltaTime, double left, double right, double top, double bottom) {
+
         updateCurrentState();
 
-        double tX = 0;
-        double tY = 0;
+        final double arcX = plate.getWidth() - plate.getRadius();
+        final double arcY = plate.getHeight() - plate.getRadius();
+
+        double tX;
+        double tY;
         Node currentNode;
-        Node temp;
+        Node leftNode;
+        Node rightNode;
+        Node topNode;
+        Node bottomNode;
         int i;
         int j;
+        boolean edge = false;
+
         for (j = 0; j < getMaxYIndex() + 1; ++j) {
-            for (i = 0; currentState.containsKey(i + ";" + j); ++i) {
+            for (i = 0; (currentNode = currentState.get(i + ";" + j)) != null; ++i) {
+                edge = false;
                 tX = 0;
                 tY = 0;
-                if ((currentNode = currentState.get(i + ";" + j)) != null) {
-                    tX -= 2 * currentNode.getTemperature();
-                    tY -= 2 * currentNode.getTemperature();
+
+                leftNode = currentState.get((i - 1) + ";" + j);
+                rightNode = currentState.get((i + 1) + ";" + j);
+                topNode = currentState.get(i + ";" + (j + 1));
+                bottomNode = currentState.get(i + ";" + (j - 1));
+
+                if (currentNode.isEdge()) {
+                    currentNode.setTemperature(right);
+                    edge = true;
                 }
-                boolean edgeX = false;
-                boolean edgeY = false;
-                if ((temp = currentState.get((i + 1) + ";" + j)) != null) {
-                    tX += temp.getTemperature();
-                    if ((temp = currentState.get((i - 1) + ";" + j)) != null) {
-                        tX += temp.getTemperature();
+                if (rightNode == null && !edge) {
+                    currentNode.setTemperature(right);
+                    edge = true;
+                }
+                if (leftNode == null && !edge) {
+                    currentNode.setTemperature(left);
+                    edge = true;
+                }
+                if (topNode == null && !edge) {
+                    currentNode.setTemperature(top);
+                    edge = true;
+                }
+                if (bottomNode == null && !edge) {
+                    currentNode.setTemperature(bottom);
+                    edge = true;
+                }
+                if (!edge) {
+                    if (rightNode.isEdge()) {
+                        double mu = (arcX +
+                                Math.sqrt(Math.pow(plate.getRadius(), 2)
+                                        - Math.pow(currentNode.getPoint().getY() - arcY, 2))
+                                - currentNode.getPoint().getX()) / dx;
+                        mu = Math.abs(mu);
+                        tX -= (mu + 1) * currentNode.getTemperature();
+                        tX += right;
+                        tX += mu * leftNode.getTemperature();
+                        tX = 2 * tX / (dx * dx * mu * (mu + 1));
                     } else {
-                        edgeX = true;
-                        tX = left;
+                        tX -= 2 * currentNode.getTemperature();
+                        tX += rightNode.getTemperature();
+                        tX += leftNode.getTemperature();
+                        tX /= (dx * dx);
                     }
-                } else {
-                    edgeX = true;
-                    tX = right;
-                }
-                if ((temp = currentState.get(i + ";" + (j - 1))) != null && !edgeX) {
-                    tY += temp.getTemperature();
-                    if ((temp = currentState.get(i + ";" + (j + 1))) != null) {
-                        tY += temp.getTemperature();
+
+                    if (topNode.isEdge()) {
+                        double mu = (arcY +
+                                Math.sqrt(Math.pow(plate.getRadius(), 2)
+                                        - Math.pow(currentNode.getPoint().getX() - arcX, 2))
+                                - currentNode.getPoint().getY()) / dx;
+                        mu = Math.abs(mu);
+                        tY -= (mu + 1) * currentNode.getTemperature();
+                        tY += right;
+                        tY += mu * bottomNode.getTemperature();
+                        tY = 2 * tY / (dy * dy * mu * (mu + 1));
                     } else {
-                        edgeY = true;
-                        tY = top;
+                        tY -= 2 * currentNode.getTemperature();
+                        tY += topNode.getTemperature();
+                        tY += bottomNode.getTemperature();
+                        tY /= (dy * dy);
                     }
-                } else {
-                    edgeY = true;
-                    tY = bottom;
-                }
-                if (!(edgeX || edgeY)) {
-                    nodes.get(i + ";" + j).setTemperature(currentNode.getTemperature() + deltaTime * (tX / (dx * dx) + tY / (dy * dy)));
-                } else {
-                    nodes.get(i + ";" + j).setTemperature(edgeX == true ? tX : tY);
+                    currentNode.setTemperature(currentNode.getTemperature() + deltaTime * (tX + tY));
                 }
             }
         }

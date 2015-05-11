@@ -8,11 +8,15 @@ import java.awt.geom.Point2D;
 public class Node implements  Cloneable{
     private Point2D point;
     private double temperature;
+    private boolean isEdge;
 
-    public Node(Point2D point, double temperature) {
+    public Node(Point2D point, double temperature, boolean isEdge) {
         this.point = point;
         this.temperature = temperature;
+        this.isEdge = isEdge;
     }
+
+    public boolean isEdge() { return isEdge; }
 
     public Point2D getPoint() {
         return point;

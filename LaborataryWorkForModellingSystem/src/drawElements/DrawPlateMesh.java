@@ -7,6 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -20,6 +23,7 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
     final protected double scaleX;
     final protected double scaleY;
     final private DrawPlate drawPlate;
+    private Path2D path;
 
     public DrawPlateMesh (MeshForPlateWithRoundCorner mesh, double scaleX, double scaleY) {
         this.scaleX = scaleX;
@@ -27,54 +31,82 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
         this.mesh = mesh;
         drawPlate = new DrawPlate(mesh.getPlate(), scaleX, scaleY);
         timer = new Timer((int) (Settings.deltaTime * 1000), this);
+        path = drawPlate.getPath();
     }
 
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
 
-
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        drawPlate.paintComponent(g);
-
         int limitY = mesh.getMaxYIndex();
+        int limitX = mesh.getMaxXIndex();
+        double dx = mesh.getDx();
+        double dy = mesh.getDy();
+
+        double zeroX = mesh.getX();
+        double zeroY = mesh.getY();
+
+        for (int i = 0; i < limitX + 1; ++i) {
+            g2.draw(new Line2D.Double(zeroX + i * dx * scaleX, zeroY, zeroX + i * dx * scaleX, zeroY + limitY * dy * scaleY));
+        }
+
+        for (int i = 0; i < limitY + 1; ++i) {
+            g2.draw(new Line2D.Double(zeroX, zeroY + i * dy * scaleY, zeroX + limitX * dx * scaleX, zeroY + i * dy * scaleY));
+        }
+
+        double rad = 1;
+        g2.draw(path);
+        for (int j = 0; j < limitY; ++j) {
+            for (int i = 0; mesh.contains((i + 1), (j + 1)); ++i) {
+                if (mesh.getNode(i, j).isEdge()) {
+                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i, j).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i, j).getPoint().getY() + rad/2 )* scaleY, rad * scaleX, -1 * rad * scaleY));
+                }
+                if (mesh.getNode(i, j + 1).isEdge()) {
+                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i, j + 1).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i, j + 1).getPoint().getY() + rad/2) * scaleY, rad * scaleX, -1 * rad * scaleY));
+                }
+                if (mesh.getNode(i + 1, j).isEdge()) {
+                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i + 1, j).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i + 1, j).getPoint().getY() + rad/2) * scaleY, rad * scaleX, -1 * rad * scaleY));
+                }
+                if (mesh.getNode(i + 1, j + 1).isEdge()) {
+                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i + 1, j + 1).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i + 1, j + 1).getPoint().getY() + rad/2) * scaleY, rad * scaleX, -1 * rad * scaleY));
+                }
+            }
+        }
+        g2.clip(path);
+//        drawPlate.paintComponent(g);
 
         for (int j = 0; j < limitY; ++j) {
             for (int i = 0; mesh.contains((i + 1), (j + 1)); ++i) {
+
                 Rectangle2D rect = new Rectangle2D.Double();
                 rect.setFrameFromDiagonal(
                         mesh.getX() + mesh.getNode(i, j).getPoint().getX() * scaleX,
                         mesh.getY() + mesh.getNode(i, j).getPoint().getY() * scaleY,
                         mesh.getX() + mesh.getNode((i + 1), (j + 1)).getPoint().getX() * scaleX,
                         mesh.getY() + mesh.getNode((i + 1), (j + 1)).getPoint().getY() * scaleY
-                        );
-                double avgTemp = (mesh.getNode(i, j).getTemperature() +
+                );
+                double avgTemp = 0;
+                avgTemp = (mesh.getNode(i, j).getTemperature() +
                         mesh.getNode(i, (j + 1)).getTemperature() +
-                        mesh.getNode((i + 1), j).getTemperature() +
-                        mesh.getNode((i + 1), (j + 1)).getTemperature()) / 4.0;
+                        mesh.getNode((i + 1), j + 1).getTemperature() +
+                        mesh.getNode((i + 1), j).getTemperature()) / 4.0;
                 int red = (int)(avgTemp / 200 * 255);
                 if (red > 255) {
                     red = 255;
-                    System.out.println("Red more than 255 i = " + i + " j = " + j);
                 }
                 if (red < 0) {
-                    System.out.println("Red less than 0 i = " + i + " j = " + j);
                     red = 0;
                 }
                 int blue = 255 - red;
-                try {
-                    g2.setPaint(new Color(red, 0, blue, 150));
-                } catch (Exception e) {
-                    System.out.println("I have tried");
-                    System.exit(1);
-                }
+
+                g2.setPaint(new Color(red, 0, blue, 150));
                 g2.fill(rect);
                 g2.draw(rect);
                 g2.setPaint(new Color(0, 0, 0));
             }
         }
-
     }
 
     @Override
@@ -93,6 +125,7 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
         timer.start();
     }
     public void stop() {
+        System.out.println("Iteration number: " + count);
         System.out.println("Stopped");
         timer.stop();
     }

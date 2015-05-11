@@ -2,6 +2,7 @@ package frames;
 
 import drawElements.DrawPlateMesh;
 import elements.PlateWithRoundCorner;
+import helper.Settings;
 import phisics.MeshForPlateWithRoundCorner;
 
 import javax.swing.*;
@@ -14,8 +15,8 @@ import java.awt.event.ActionListener;
  */
 public class ElementFrame extends JFrame {
     public ElementFrame(PlateWithRoundCorner plate, final MeshForPlateWithRoundCorner mesh) {
-        double scaleX = 90;
-        double scaleY = 90;
+        double scaleX = Settings.scaleX;
+        double scaleY = Settings.scaleY;
 
         JPanel panel = new JPanel(new BorderLayout());
 //        panel.setLayout(null);

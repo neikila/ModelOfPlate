@@ -2,10 +2,7 @@ package frames;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Path2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 
 /**
  * Created by neikila on 12.04.15.
@@ -49,7 +46,7 @@ public class TestFrame extends JFrame{
 
 //                path.curveTo(x1, y1, x2, y2, x3, y3);
 //                path.quadTo(x1,y1, x2, y2);
-
+//
 //                path.lineTo(x0 - radius, y0 + 40);
 //                path.lineTo(x0 + 20, y0 + 40);
 
@@ -62,26 +59,31 @@ public class TestFrame extends JFrame{
                 Rectangle2D rect = new Rectangle2D.Double();
                 rect.setFrameFromDiagonal(second, first);
 
-                path.append(rect, true);
+//                path.append(rect, true);
 
-                path.closePath();
+//                path.closePath();
+//                g2.clip(path);
 //                x0 -= width;
 
-//                Arc2D arc = new Arc2D.Double(x0 - radius, y0 - radius, radius * 2, radius * 2, 90 * 1, 90, Arc2D.PIE);
-                Arc2D arc = new Arc2D.Double();
-                arc.setArcByTangent(second, new Point2D.Double(x0 - 2 * radius, y0 - radius), new Point2D.Double(x0 - 2 * radius, y0), radius);
-                arc.setArcType(Arc2D.PIE);
-//                arc.setAngleStart(new Point2D.Double(x0 - width, y0));
-//                arc.setAngles(second, new Point2D.Double(x0 - 2 * radius, y0));
-                g2.draw(arc);
-                g2.setPaint(new Color(0, 255, 255, 100));
-                g2.fill(arc);
+                Arc2D arc = new Arc2D.Double(x0 - radius, y0 - radius, radius * 2, radius * 2, 90 * 1, 90, Arc2D.PIE);
+                path.append(arc, true);
 
+//                Arc2D arc = new Arc2D.Double();
+//                arc.setArcByTangent(second, new Point2D.Double(x0 - 2 * radius, y0 - radius), new Point2D.Double(x0 - 2 * radius, y0), radius);
+//                arc.setArcType(Arc2D.PIE);
+////                arc.setAngleStart(new Point2D.Double(x0 - width, y0));
+////                arc.setAngles(second, new Point2D.Double(x0 - 2 * radius, y0));
+//                g2.draw(arc);
+//                g2.setPaint(new Color(0, 255, 255, 100));
+//                g2.fill(arc);
+                g2.clip(path);
+
+                g2.draw(rect);
+                g2.fill(rect);
                 g2.setPaint(new Color(255, 255, 0, 255));
-//                path.append(arc, true);
 
 //                g2.fill(path);
-//                g2.draw(path);
+                g2.draw(path);
             }
         });
         setLocationRelativeTo(null);

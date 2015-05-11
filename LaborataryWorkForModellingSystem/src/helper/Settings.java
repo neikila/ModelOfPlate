@@ -10,8 +10,11 @@ public class Settings {
     public static final double zeroX = 100;
     public static final double zeroY = 600;
 
-    public static final double dx = 0.2;
-    public static final double dy = 0.2;
+    public static final double scaleX = 90;
+    public static final double scaleY = 90;
+
+    public static final double dx = 0.5;
+    public static final double dy = 0.5;
 
     public static final double defaultTemperature = 0;
 
@@ -22,5 +25,5 @@ public class Settings {
     public static final double topTemperature = 100;
     public static final double bottomTemperature = 20;
 
-    public static final int count = 2500;
+    public static final int count = 25000;
 }
