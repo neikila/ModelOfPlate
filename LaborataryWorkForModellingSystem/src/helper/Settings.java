@@ -1,5 +1,8 @@
 package helper;
 
+import java.nio.file.Paths;
+import java.util.Scanner;
+
 /**
  * Created by neikila on 12.04.15.
  */
@@ -25,5 +28,49 @@ public class Settings {
     public static double topTemperature = 100;
     public static double bottomTemperature = 50;
 
-    public static final int count = 25000;
+    public static boolean printToFile = true;
+
+    public static int count = 25;
+
+    public static int iterationNum;
+
+    public static void getSet() {
+        try {
+            Scanner settings = new Scanner(Paths.get("settings"));
+
+            settings.next();
+            dx = settings.nextDouble();
+            settings.next();
+            dy = settings.nextDouble();
+            settings.next();
+            deltaTime = settings.nextDouble();
+            settings.next();
+            defaultTemperature = settings.nextDouble();
+            settings.next();
+            leftTemperature = settings.nextDouble();
+            settings.next();
+            rightTemperature = settings.nextDouble();
+            settings.next();
+            topTemperature = settings.nextDouble();
+            settings.next();
+            bottomTemperature = settings.nextDouble();
+            settings.next();
+            printToFile = settings.nextBoolean();
+
+            iterationNum = (int) (count / deltaTime);
+
+            System.out.println("dx = " + Settings.dx);
+            System.out.println("dy = " + Settings.dy);
+            System.out.println("deltaTime = " + Settings.deltaTime);
+            System.out.println("defaultTemperature  = " + Settings.defaultTemperature);
+            System.out.println("leftTemperature = " + Settings.leftTemperature);
+            System.out.println("rightTemperature = " + Settings.rightTemperature);
+            System.out.println("topTemperature = " + Settings.topTemperature);
+            System.out.println("bottomTemperature = " + Settings.bottomTemperature);
+            System.out.println("printToFile = " + Settings.printToFile);
+        } catch (Exception e) {
+            System.out.println("Ups. No Settings");
+            System.exit(-1);
+        }
+    }
 }

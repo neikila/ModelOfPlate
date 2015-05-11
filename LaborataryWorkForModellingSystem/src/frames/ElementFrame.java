@@ -19,7 +19,6 @@ public class ElementFrame extends JFrame {
         double scaleY = Settings.scaleY;
 
         JPanel panel = new JPanel(new BorderLayout());
-//        panel.setLayout(null);
         panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createLineBorder(Color.black)));
         setContentPane(panel);
@@ -29,8 +28,6 @@ public class ElementFrame extends JFrame {
         panel.add(meshComponent);
 
         final JButton button = new JButton("Start");
-        //button.setSize(new Dimension(100, 30));
-        //button.setLocation(100, 700);
         button.addActionListener(new ActionListener() {
             private boolean pulsing = false;
             @Override
@@ -48,9 +45,7 @@ public class ElementFrame extends JFrame {
         });
         panel.add(button, BorderLayout.SOUTH);
 
-//        add(meshComponent);
         setLocationRelativeTo(null);
-//        pack();
         setExtendedState(Frame.MAXIMIZED_BOTH);
     }
 }

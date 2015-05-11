@@ -1,0 +1,8 @@
+dx 0.2
+dy 0.2
+deltatime 0.01
+defaultTemp 0
+left 200
+right 100
+top 100
+bottom 50

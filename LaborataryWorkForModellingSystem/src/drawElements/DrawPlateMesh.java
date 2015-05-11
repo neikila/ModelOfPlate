@@ -7,10 +7,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
+import java.nio.file.Paths;
+import java.util.Scanner;
 
 /**
  * Created by neikila on 11.04.15.
@@ -56,24 +57,24 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
             g2.draw(new Line2D.Double(zeroX, zeroY + i * dy * scaleY, zeroX + limitX * dx * scaleX, zeroY + i * dy * scaleY));
         }
 
-        double rad = 1;
         g2.draw(path);
-        for (int j = 0; j < limitY; ++j) {
-            for (int i = 0; mesh.contains((i + 1), (j + 1)); ++i) {
-                if (mesh.getNode(i, j).isEdge()) {
-                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i, j).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i, j).getPoint().getY() + rad/2 )* scaleY, rad * scaleX, -1 * rad * scaleY));
-                }
-                if (mesh.getNode(i, j + 1).isEdge()) {
-                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i, j + 1).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i, j + 1).getPoint().getY() + rad/2) * scaleY, rad * scaleX, -1 * rad * scaleY));
-                }
-                if (mesh.getNode(i + 1, j).isEdge()) {
-                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i + 1, j).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i + 1, j).getPoint().getY() + rad/2) * scaleY, rad * scaleX, -1 * rad * scaleY));
-                }
-                if (mesh.getNode(i + 1, j + 1).isEdge()) {
-                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i + 1, j + 1).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i + 1, j + 1).getPoint().getY() + rad/2) * scaleY, rad * scaleX, -1 * rad * scaleY));
-                }
-            }
-        }
+//        double rad = 1;
+//        for (int j = 0; j < limitY; ++j) {
+//            for (int i = 0; mesh.contains((i + 1), (j + 1)); ++i) {
+//                if (mesh.getNode(i, j).isEdge()) {
+//                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i, j).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i, j).getPoint().getY() + rad/2 )* scaleY, rad * scaleX, -1 * rad * scaleY));
+//                }
+//                if (mesh.getNode(i, j + 1).isEdge()) {
+//                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i, j + 1).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i, j + 1).getPoint().getY() + rad/2) * scaleY, rad * scaleX, -1 * rad * scaleY));
+//                }
+//                if (mesh.getNode(i + 1, j).isEdge()) {
+//                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i + 1, j).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i + 1, j).getPoint().getY() + rad/2) * scaleY, rad * scaleX, -1 * rad * scaleY));
+//                }
+//                if (mesh.getNode(i + 1, j + 1).isEdge()) {
+//                    g2.draw(new Ellipse2D.Double(mesh.getX() + (mesh.getNode(i + 1, j + 1).getPoint().getX() - rad/2) * scaleX, mesh.getY() + (mesh.getNode(i + 1, j + 1).getPoint().getY() + rad/2) * scaleY, rad * scaleX, -1 * rad * scaleY));
+//                }
+//            }
+//        }
         g2.clip(path);
 
         for (int j = 0; j < limitY; ++j) {
@@ -110,13 +111,13 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        mesh.iteration(Settings.deltaTime, Settings.leftTemperature, Settings.rightTemperature, Settings.topTemperature, Settings.bottomTemperature);
+        getMeshFromFile("step" + count);
         repaint();
         ++count;
         if (count % 100 == 0) {
             System.out.println("Iteration number: " + count);
         }
-        if (count  > Settings.count)
+        if (count > Settings.count)
             stop();
     }
 
@@ -127,6 +128,21 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
         System.out.println("Iteration number: " + count);
         System.out.println("Stopped");
         timer.stop();
+    }
+
+    private void getMeshFromFile(String fileName) {
+        try {
+            Scanner step = new Scanner(Paths.get("out/filename"));
+            int i, j;
+            while(step.hasNext()) {
+                i = step.nextInt();
+                j = step.nextInt();
+                mesh.getNode(i, j).setTemperature(step.nextDouble());
+            }
+        } catch (Exception e) {
+            System.out.println("Ups. No Settings");
+            System.exit(-1);
+        }
     }
 
     @Override

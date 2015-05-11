@@ -1,6 +1,7 @@
 package phisics;
 
 import elements.PlateWithRoundCorner;
+import helper.Settings;
 
 import java.awt.geom.Point2D;
 import java.io.FileNotFoundException;
@@ -220,7 +221,7 @@ public class MeshForPlateWithRoundCorner {
         }
         printToFile("out/step" + count);
         ++count;
-        if(count % 100 == 0) {
+        if (count % 100 == 0) {
             System.out.println("Iteration Number = " + count);
         }
     }
@@ -235,12 +236,21 @@ public class MeshForPlateWithRoundCorner {
             file = new PrintWriter(fileName);
             int limitY = getMaxYIndex() + 1;
             Node temp;
-            for (int j = 0; j < limitY; ++j) {
-                for (int i = 0; (temp = getNode(i, j)) != null; ++i) {
-                    String result = "" + temp.getPoint().getX() + ' ' + temp.getPoint().getY() + ' ' + temp.getTemperature();
-                    file.println(result);
+            if (Settings.printToFile) {
+                for (int j = 0; j < limitY; ++j) {
+                    for (int i = 0; (temp = getNode(i, j)) != null; ++i) {
+                        String result = "" + temp.getPoint().getX() + ' ' + temp.getPoint().getY() + ' ' + temp.getTemperature();
+                        file.println(result);
+                    }
+                    file.println();
                 }
-                file.println();
+            } else {
+                for (int j = 0; j < limitY; ++j) {
+                    for (int i = 0; (temp = getNode(i, j)) != null; ++i) {
+                        String result = "" + i + ' ' + j + ' ' + temp.getTemperature();
+                        file.println(result);
+                    }
+                }
             }
         } catch (FileNotFoundException e) {
             System.out.println("Ups. No such file.");
