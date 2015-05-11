@@ -13,17 +13,17 @@ public class Settings {
     public static final double scaleX = 90;
     public static final double scaleY = 90;
 
-    public static final double dx = 0.2;
-    public static final double dy = 0.2;
+    public static double dx = 1;
+    public static double dy = 1;
 
-    public static final double defaultTemperature = 0;
+    public static double deltaTime = 0.1;
 
-    public static final double deltaTime = 0.002;
+    public static double defaultTemperature = 0;
 
-    public static final double leftTemperature = 200;
-    public static final double rightTemperature = 100;
-    public static final double topTemperature = 100;
-    public static final double bottomTemperature = 50;
+    public static double leftTemperature = 200;
+    public static double rightTemperature = 100;
+    public static double topTemperature = 100;
+    public static double bottomTemperature = 50;
 
     public static final int count = 25000;
 }

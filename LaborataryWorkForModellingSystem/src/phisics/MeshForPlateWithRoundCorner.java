@@ -218,8 +218,11 @@ public class MeshForPlateWithRoundCorner {
                 }
             }
         }
-        printToFile("LaborataryWorkForModellingSystem/out/step" + count);
+        printToFile("out/step" + count);
         ++count;
+        if(count % 100 == 0) {
+            System.out.println("Iteration Number = " + count);
+        }
     }
 
     public long getCount() {
