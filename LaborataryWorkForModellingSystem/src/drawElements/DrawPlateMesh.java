@@ -75,7 +75,6 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
             }
         }
         g2.clip(path);
-//        drawPlate.paintComponent(g);
 
         for (int j = 0; j < limitY; ++j) {
             for (int i = 0; mesh.contains((i + 1), (j + 1)); ++i) {

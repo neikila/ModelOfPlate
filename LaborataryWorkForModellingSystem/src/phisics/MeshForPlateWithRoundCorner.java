@@ -3,6 +3,8 @@ package phisics;
 import elements.PlateWithRoundCorner;
 
 import java.awt.geom.Point2D;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ import java.util.Map;
  * Created by neikila on 12.04.15.
  */
 public class MeshForPlateWithRoundCorner {
+    private static long count = 0;
     private final double dx;
     private final double dy;
     private HashMap<String, Node> currentState;
@@ -81,24 +84,6 @@ public class MeshForPlateWithRoundCorner {
                 }
             }
         }
-
-//        for (i = limitXBeforeArc; i < limitX; ++i) {
-//            x = i * dx;
-//            y = arcY + Math.sqrt(Math.pow(plate.getRadius(), 2) - Math.pow(i * dx - arcX, 2));
-//            j = ((int)(y / dy) + 1);
-//            y = j * dy;
-//            if (!nodes.containsKey(i + ";" + j))
-//                nodes.put(i + ";" + j, new Node(new Point2D.Double(x, y), defaultTemperature));
-//        }
-//
-//        for (i = limitYBeforeArc; i < limitY; ++i) {
-//            y = i * dy;
-//            x = arcX + Math.sqrt(Math.pow(plate.getRadius(), 2) - Math.pow(i * dy - arcY, 2));
-//            j = ((int)(x / dx) + 1);
-//            x = j * dx;
-//            if (!nodes.containsKey(j + ";" + i))
-//                nodes.put(j + ";" + i, new Node(new Point2D.Double(x, y), defaultTemperature));
-//        }
         updateCurrentState();
     }
 
@@ -231,6 +216,34 @@ public class MeshForPlateWithRoundCorner {
                     }
                     currentNode.setTemperature(currentNode.getTemperature() + deltaTime * (tX + tY));
                 }
+            }
+        }
+        printToFile("LaborataryWorkForModellingSystem/out/step" + count);
+        ++count;
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    private void printToFile(String fileName) {
+        PrintWriter file = null;
+        try {
+            file = new PrintWriter(fileName);
+            int limitY = getMaxYIndex() + 1;
+            Node temp;
+            for (int j = 0; j < limitY; ++j) {
+                for (int i = 0; (temp = getNode(i, j)) != null; ++i) {
+                    String result = "" + temp.getPoint().getX() + ' ' + temp.getPoint().getY() + ' ' + temp.getTemperature();
+                    file.println(result);
+                }
+                file.println();
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Ups. No such file.");
+        } finally {
+            if (file != null) {
+                file.close();
             }
         }
     }
