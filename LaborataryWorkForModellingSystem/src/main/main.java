@@ -60,7 +60,7 @@ public class main {
             file.println("set view map\n");
             String pause = "pause "+ Settings.deltaTime +"\n";
             long count = mesh.getCount();
-            for (int i = 0; i < count; ++i) {
+            for (int i = 0; i < count; i += Settings.step) {
                 file.println("splot 'out/step" + i + "' with pm3d\n" + pause);
             }
             file.println("pause -1\n");

@@ -2,6 +2,7 @@ package frames;
 
 import drawElements.DrawPlateMesh;
 import elements.PlateWithRoundCorner;
+import helper.ReverseEvent;
 import helper.Settings;
 import phisics.MeshForPlateWithRoundCorner;
 
@@ -23,27 +24,32 @@ public class ElementFrame extends JFrame {
                 BorderFactory.createLineBorder(Color.black)));
         setContentPane(panel);
 
-        final DrawPlateMesh meshComponent = new DrawPlateMesh(mesh, scaleX, scaleY);
+        final ReverseEvent reverseEvent = new ReverseEvent();
+
+        final DrawPlateMesh meshComponent = new DrawPlateMesh(mesh, scaleX, scaleY, reverseEvent);
         meshComponent.setLocation(100, 100);
         panel.add(meshComponent);
 
         final JButton button = new JButton("Start");
+        final JButton button2 = new JButton("Restart");
         button.addActionListener(new ActionListener() {
-            private boolean pulsing = false;
+
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (pulsing) {
-                    pulsing = false;
-                    meshComponent.stop();
-                    button.setText("Start");
-                } else {
-                    pulsing = true;
-                    meshComponent.start();
-                    button.setText("Stop");
-                }
+                reverseEvent.buttonOnePressed(meshComponent);
             }
         });
+        button2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reverseEvent.buttonTwoPressed(meshComponent);
+            }
+        });
+
+        reverseEvent.setObjects(button, button2);
+
         panel.add(button, BorderLayout.SOUTH);
+        panel.add(button2, BorderLayout.NORTH);
 
         setLocationRelativeTo(null);
         setExtendedState(Frame.MAXIMIZED_BOTH);

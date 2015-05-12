@@ -1,5 +1,6 @@
 package drawElements;
 
+import helper.ReverseEvent;
 import helper.Settings;
 import phisics.MeshForPlateWithRoundCorner;
 
@@ -25,14 +26,16 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
     final protected double scaleY;
     final private DrawPlate drawPlate;
     private Path2D path;
+    private ReverseEvent reverseEvent;
 
-    public DrawPlateMesh (MeshForPlateWithRoundCorner mesh, double scaleX, double scaleY) {
+    public DrawPlateMesh (MeshForPlateWithRoundCorner mesh, double scaleX, double scaleY, ReverseEvent reverseEvent) {
         this.scaleX = scaleX;
         this.scaleY = -1 * scaleY;
         this.mesh = mesh;
         drawPlate = new DrawPlate(mesh.getPlate(), scaleX, scaleY);
-        timer = new Timer((int) (Settings.deltaTime * 1000), this);
+        timer = new Timer((int) (Settings.deltaTime * 1000 * Settings.step), this);
         path = drawPlate.getPath();
+        this.reverseEvent = reverseEvent;
     }
 
     @Override
@@ -93,6 +96,8 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
                         mesh.getNode((i + 1), j + 1).getTemperature() +
                         mesh.getNode((i + 1), j).getTemperature()) / 4.0;
                 int red = (int)(avgTemp / 200 * 255);
+                int roundSeed = Settings.colorStep;
+                red = (red / roundSeed) * roundSeed;
                 if (red > 255) {
                     red = 255;
                 }
@@ -111,28 +116,37 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        getMeshFromFile("step" + count);
-        repaint();
-        ++count;
-        if (count % 100 == 0) {
-            System.out.println("Iteration number: " + count);
-        }
-        if (count > Settings.count)
+        if (count < Settings.iterationNum) {
+            getMeshFromFile("step" + count);
+            repaint();
+            count += Settings.step;
+            if (count % 100 == 0) {
+                System.out.println("Iteration number: " + count);
+            }
+        } else {
+            reverseEvent.finished();
             stop();
+        }
     }
 
     public void start() {
         timer.start();
     }
+
     public void stop() {
         System.out.println("Iteration number: " + count);
         System.out.println("Stopped");
         timer.stop();
     }
 
+    public void restart() {
+        stop();
+        count = 0;
+    }
+
     private void getMeshFromFile(String fileName) {
         try {
-            Scanner step = new Scanner(Paths.get("out/filename"));
+            Scanner step = new Scanner(Paths.get("out/" + fileName));
             int i, j;
             while(step.hasNext()) {
                 i = step.nextInt();
@@ -140,7 +154,7 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
                 mesh.getNode(i, j).setTemperature(step.nextDouble());
             }
         } catch (Exception e) {
-            System.out.println("Ups. No Settings");
+            System.out.println("Ups no such " + fileName);
             System.exit(-1);
         }
     }
@@ -149,5 +163,4 @@ public class DrawPlateMesh extends JComponent implements ActionListener {
     public Dimension getPreferredSize() {
         return drawPlate.getPreferredSize();
     }
-
 }

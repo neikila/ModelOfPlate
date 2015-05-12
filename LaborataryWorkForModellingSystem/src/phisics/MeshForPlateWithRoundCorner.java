@@ -219,7 +219,9 @@ public class MeshForPlateWithRoundCorner {
                 }
             }
         }
-        printToFile("out/step" + count);
+        if (count %  Settings.step == 0) {
+            printToFile("out/step" + count);
+        }
         ++count;
         if (count % 100 == 0) {
             System.out.println("Iteration Number = " + count);

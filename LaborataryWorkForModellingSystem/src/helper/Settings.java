@@ -32,6 +32,10 @@ public class Settings {
 
     public static int count = 25;
 
+    public static int step = 1;
+
+    public static int colorStep = 30;
+
     public static int iterationNum;
 
     public static void getSet() {
@@ -40,22 +44,42 @@ public class Settings {
 
             settings.next();
             dx = settings.nextDouble();
+
             settings.next();
             dy = settings.nextDouble();
+
             settings.next();
             deltaTime = settings.nextDouble();
+
             settings.next();
             defaultTemperature = settings.nextDouble();
+
             settings.next();
             leftTemperature = settings.nextDouble();
+
             settings.next();
             rightTemperature = settings.nextDouble();
+
             settings.next();
             topTemperature = settings.nextDouble();
+
             settings.next();
             bottomTemperature = settings.nextDouble();
+
             settings.next();
             printToFile = settings.nextBoolean();
+
+            settings.next();
+            step = settings.nextInt();
+            if(step < 1) {
+                step = 1;
+            }
+
+            settings.next();
+            colorStep = settings.nextInt();
+            if(colorStep < 1) {
+                colorStep = 15;
+            }
 
             iterationNum = (int) (count / deltaTime);
 
