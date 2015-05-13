@@ -58,7 +58,7 @@ public class main {
             file = new PrintWriter("result");
             file.println("set cbrange [0:200]");
             file.println("set view map\n");
-            String pause = "pause "+ Settings.deltaTime +"\n";
+            String pause = "pause "+ Settings.deltaTime * Settings.step +"\n";
             long count = mesh.getCount();
             for (int i = 0; i < count; i += Settings.step) {
                 file.println("splot 'out/step" + i + "' with pm3d\n" + pause);

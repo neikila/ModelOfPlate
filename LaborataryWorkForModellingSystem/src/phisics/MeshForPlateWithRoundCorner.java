@@ -156,12 +156,18 @@ public class MeshForPlateWithRoundCorner {
                 tX = 0;
                 tY = 0;
 
+
                 leftNode = currentState.get((i - 1) + ";" + j);
                 rightNode = currentState.get((i + 1) + ";" + j);
                 topNode = currentState.get(i + ";" + (j + 1));
                 bottomNode = currentState.get(i + ";" + (j - 1));
 
-                if (currentNode.isEdge()) {
+                if(i == 0 && (j == getMaxYIndex() / 2)) {
+                    currentNode.setTemperature(rightNode.getTemperature() / (1 + dx));
+                    edge = true;
+                }
+
+                if (currentNode.isEdge() && !edge) {
                     currentNode.setTemperature(right);
                     edge = true;
                 }
