@@ -36,6 +36,10 @@ public class Settings {
 
     public static int colorStep = 30;
 
+    public static double maxTemp = 200;
+
+    public static double minTemp = 0;
+
     public static int iterationNum;
 
     public static void getSet() {
